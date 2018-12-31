@@ -1,6 +1,10 @@
 # sora (صورة)
-Sora means `image/picture` in Arabic. It is a simple library to display and embed images in Jupyter notebooks. You can use it to:
+Sora means `image/picture` in Arabic. It is a simple library to display and embed images in Jupyter notebooks. Check out the [example.ipynb](https://github.com/mznmel/sora/blob/master/example.ipynb) notebook to see the results.
 
+## Installation
+`pip install sora`
+
+## Usage
 ```python
 from sora import sora
 
