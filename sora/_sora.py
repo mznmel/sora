@@ -91,6 +91,11 @@ def _load_directory(dir_path):
 
 
 def sora(arg, **kwargs):
+
+    cell_width = kwargs.get("cell_width", 32)
+    cell_height = kwargs.get("cell_height", 32)
+    items_per_row = kwargs.get("items_per_row", 5)
+
     html = ""
     if isinstance(arg, str):
         # arg is a string
@@ -98,9 +103,6 @@ def sora(arg, **kwargs):
             # arg is a string with a trailing slash,
             # let's find all the images and display them in a grid
             all_images = _load_directory(arg)
-            cell_width = kwargs.get("cell_width", 32)
-            cell_height = kwargs.get("cell_height", 32)
-            items_per_row = kwargs.get("items_per_row", 2)
             html = _images_to_grid(all_images, cell_width, cell_height, items_per_row)
         else:
             # arg is a single file path
@@ -112,6 +114,14 @@ def sora(arg, **kwargs):
             img = Image.fromarray(arg)
             base64_src = _image_obj_to_src(img)
             html = _html_img(base64_src)
+        if arg.ndim == 4:
+            # collection of images
+            all_images = []
+            for i in range(arg.shape[0]):
+                img = Image.fromarray(arg[i, :])
+                all_images.append(img)
+
+            html = _images_to_grid(all_images, cell_width, cell_height, items_per_row)
 
     return display(HTML(html))
 
