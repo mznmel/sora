@@ -6,6 +6,7 @@ import base64
 from PIL import Image
 import io
 import math
+import numpy as np
 
 MIME_TYPES = {
     ".jpg": "image/jpeg",
@@ -65,12 +66,16 @@ def _images_to_grid(list_images, cell_width=32, cell_height=32, items_per_row=3)
         canvas.paste(img, box=(x, y))
         img.close()
 
-    with io.BytesIO() as output:
-        canvas.save(output, format="JPEG")
-        canvas_base64 = _image_to_base64_src(output.getvalue(), MIME_TYPES[".jpg"])
+    canvas_base64 = _image_obj_to_src(canvas)
 
     return _html_img(canvas_base64)
 
+def _image_obj_to_src(image_obj):
+    with io.BytesIO() as output:
+        image_obj.save(output, format="JPEG")
+        base64_src = _image_to_base64_src(output.getvalue(), MIME_TYPES[".jpg"])
+
+    return base64_src
 
 def _load_directory(dir_path):
     dir_full_path = path.abspath(dir_path)
@@ -86,8 +91,9 @@ def _load_directory(dir_path):
 
 
 def sora(arg, **kwargs):
-
+    html = ""
     if isinstance(arg, str):
+        # arg is a string
         if arg[-1] == "/":
             # arg is a string with a trailing slash,
             # let's find all the images and display them in a grid
@@ -96,10 +102,16 @@ def sora(arg, **kwargs):
             cell_height = kwargs.get("cell_height", 32)
             items_per_row = kwargs.get("items_per_row", 2)
             html = _images_to_grid(all_images, cell_width, cell_height, items_per_row)
-            return _html_display(html)
         else:
             # arg is a single file path
             html = _file_to_html(arg)
+    elif isinstance(arg, np.ndarray):
+        # arg is a numpy array
+        if arg.ndim == 3:
+            # single image
+            img = Image.fromarray(arg)
+            base64_src = _image_obj_to_src(img)
+            html = _html_img(base64_src)
 
     return display(HTML(html))
 
