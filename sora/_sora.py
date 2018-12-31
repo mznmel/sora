@@ -70,12 +70,14 @@ def _images_to_grid(list_images, cell_width=32, cell_height=32, items_per_row=3)
 
     return _html_img(canvas_base64)
 
+
 def _image_obj_to_src(image_obj):
     with io.BytesIO() as output:
         image_obj.save(output, format="JPEG")
         base64_src = _image_to_base64_src(output.getvalue(), MIME_TYPES[".jpg"])
 
     return base64_src
+
 
 def _load_directory(dir_path):
     dir_full_path = path.abspath(dir_path)
